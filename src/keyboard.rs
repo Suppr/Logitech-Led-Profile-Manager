@@ -3,6 +3,17 @@ extern crate logitech_led as led;
 use led::{Color, Driver, Key};
 use std::thread::sleep;
 use std::time::Duration;
+
+fn apply_alpha(basecolor: Color, alpha: f32) -> Color {
+    if (0.0 > alpha) || (1.0 < alpha) {
+        return basecolor;
+    }
+    Color::new(
+        basecolor.r * alpha,
+        basecolor.g * alpha,
+        basecolor.b * alpha,
+    )
+}
 pub struct Keyboard {
     driver: led::Driver,
     pb_keys: Vec<Key>,
@@ -96,14 +107,21 @@ impl Keyboard {
         }
         self.driver
             .set_lighting_for_key(self.pb_keys[self.pb_keys.len() - 1], self.pb_delimitercolor)?;
-        let value = (percent * (self.pb_keys.len()) as f64 - 0.5) as usize;
-        if value > 0 {
-            for i in 1..value {
-                self.driver
-                    .set_lighting_for_key(self.pb_keys[i], self.pb_barcolor)?;
-            }
+
+        let value = percent * (self.pb_keys.len() - 2) as f64;// - 0.5 + 1.0;
+        let alpha = (value - (value.floor())) as f32;
+
+        let mut i = 1;
+        while i <= (value.floor() as usize) {
+            self.driver
+                .set_lighting_for_key(self.pb_keys[i], self.pb_barcolor)?;
+            i += 1;
         }
-        sleep(Duration::from_secs(self.refreshtimer));
+        let lastc = apply_alpha(self.pb_barcolor, alpha);
+
+        let i = std::cmp::min(i, self.pb_keys.len() - 2);
+        self.driver.set_lighting_for_key(self.pb_keys[i], lastc)?;
+        sleep(Duration::from_millis(100));
         return Ok(());
     }
 }
