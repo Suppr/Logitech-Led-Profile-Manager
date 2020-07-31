@@ -1,6 +1,8 @@
 Logitech Led Profile Manager
 ============
 
+![Animation](/Animation.gif)
+
 ## Info
 Logitech Led Profile Manager let you control keyboard led device via a config file for Windows written in Rust. Multiple effects can be done, and assign an effect to a specific program.
 
@@ -8,7 +10,6 @@ Current effects :
 - MultipleWave
 - K2000
 - Progress bar (only for Winamp for the moment)
-![Animation](/Animation.gif)
 - Breathe
 - Fill
 
